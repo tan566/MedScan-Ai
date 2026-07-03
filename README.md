@@ -61,6 +61,8 @@ streamlit run app.py
 3. Click **New App** → select your repo → `app.py`
 4. Click **Deploy** ✅
 
+> If the app redirects to login, make sure the app visibility is set to **public** in Streamlit Cloud.
+
 ---
 
 ## Project Structure
