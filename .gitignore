@@ -1,0 +1,21 @@
+# Ignore Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+.env
+.venv
+venv/
+
+# Ignore large model files (not needed for demo)
+*.pth
+*.zip
+nnUNet_results/
+nnUNet_raw/
+nnUNet_preprocessed/
+temp_input/
+temp_case/
+uploads/
+
+# OS
+.DS_Store
+Thumbs.db
