@@ -247,7 +247,7 @@ def generate_synthetic_ct(case_name):
     ct[body] = np.random.normal(40, 18, np.count_nonzero(body))
 
     # --- Spine (bone ~350 HU) ---
-    spine = ((x - shape[0]//2)**2 + (y - int(shape[1]*0.22))**2) <= 7**2
+    spine = ((x - shape[0]//2)**2 + (y - int(shape[1]*0.22))**2 + 0*z) <= 7**2
     ct[spine] = np.random.normal(350, 25, np.count_nonzero(spine))
 
     # --- Liver region (~60 HU, slightly denser) ---
@@ -423,7 +423,7 @@ if "Browse" in mode:
                 (zs - sh[2]//2)**2/(sh[2]*0.44)**2
             ) <= 1.0
             body_ct[body_mask] = np.random.normal(40, 18, np.count_nonzero(body_mask))
-            spine_m = ((xs - sh[0]//2)**2 + (ys - int(sh[1]*0.22))**2) <= max(4,int(sh[0]*0.055))**2
+            spine_m = ((xs - sh[0]//2)**2 + (ys - int(sh[1]*0.22))**2 + 0*zs) <= max(4,int(sh[0]*0.055))**2
             body_ct[spine_m] = np.random.normal(350, 25, np.count_nonzero(spine_m))
             tumor_m = mask_data > 0
             body_ct[tumor_m] = np.random.normal(90, 8, np.count_nonzero(tumor_m))
