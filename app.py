@@ -233,7 +233,7 @@ def generate_synthetic_ct(case_name):
     np.random.seed(cfg["seed"])
     shape = (128, 128, 80)
 
-    x, y, z = np.mgrid[0:shape[0], 0:shape[1], 0:shape[2]]
+    x, y, z = np.ogrid[0:shape[0], 0:shape[1], 0:shape[2]]
 
     # --- Background: air = -800 HU ---
     ct = np.full(shape, -800.0, dtype=np.float32)
@@ -244,11 +244,11 @@ def generate_synthetic_ct(case_name):
         (y - shape[1]//2)**2 / (50)**2 +
         (z - shape[2]//2)**2 / (35)**2
     ) <= 1.0
-    ct[body] = np.random.normal(40, 18, shape)[body]
+    ct[body] = np.random.normal(40, 18, np.count_nonzero(body))
 
     # --- Spine (bone ~350 HU) ---
     spine = ((x - shape[0]//2)**2 + (y - int(shape[1]*0.22))**2) <= 7**2
-    ct[spine] = np.random.normal(350, 25, shape)[spine]
+    ct[spine] = np.random.normal(350, 25, np.count_nonzero(spine))
 
     # --- Liver region (~60 HU, slightly denser) ---
     liver = (
@@ -256,7 +256,7 @@ def generate_synthetic_ct(case_name):
         (y - int(shape[1]*0.55))**2 / (28)**2 +
         (z - int(shape[2]*0.50))**2 / (22)**2
     ) <= 1.0
-    ct[liver] = np.random.normal(60, 10, shape)[liver]
+    ct[liver] = np.random.normal(60, 10, np.count_nonzero(liver))
 
     # --- Kidneys (pair, ~30 HU) ---
     for kx in [int(shape[0]*0.38), int(shape[0]*0.62)]:
@@ -265,13 +265,13 @@ def generate_synthetic_ct(case_name):
             (y - int(shape[1]*0.60))**2 / (8)**2 +
             (z - int(shape[2]*0.48))**2 / (9)**2
         ) <= 1.0
-        ct[kidney] = np.random.normal(30, 12, shape)[kidney]
+        ct[kidney] = np.random.normal(30, 12, np.count_nonzero(kidney))
 
     # --- Tumor (hyperdense ~90 HU) ---
     cx, cy, cz = cfg["center"]
     rx, ry, rz = cfg["radii"]
     tumor_mask = ((x-cx)**2/rx**2 + (y-cy)**2/ry**2 + (z-cz)**2/rz**2) <= 1.0
-    ct[tumor_mask] = np.random.normal(90, 8, shape)[tumor_mask]
+    ct[tumor_mask] = np.random.normal(90, 8, np.count_nonzero(tumor_mask))
 
     zooms = (1.5, 1.5, 2.0)
     return ct, tumor_mask.astype(np.float32), zooms
@@ -415,18 +415,18 @@ if "Browse" in mode:
             cfg = DEMO_CASES[selected]
             np.random.seed(cfg["seed"])
             sh = real_mask.shape
-            xs, ys, zs = np.mgrid[0:sh[0], 0:sh[1], 0:sh[2]]
+            xs, ys, zs = np.ogrid[0:sh[0], 0:sh[1], 0:sh[2]]
             body_ct = np.full(sh, -800.0, dtype=np.float32)
             body_mask = (
                 (xs - sh[0]//2)**2/(sh[0]*0.34)**2 +
                 (ys - sh[1]//2)**2/(sh[1]*0.39)**2 +
                 (zs - sh[2]//2)**2/(sh[2]*0.44)**2
             ) <= 1.0
-            body_ct[body_mask] = np.random.normal(40, 18, sh)[body_mask]
+            body_ct[body_mask] = np.random.normal(40, 18, np.count_nonzero(body_mask))
             spine_m = ((xs - sh[0]//2)**2 + (ys - int(sh[1]*0.22))**2) <= max(4,int(sh[0]*0.055))**2
-            body_ct[spine_m] = np.random.normal(350, 25, sh)[spine_m]
+            body_ct[spine_m] = np.random.normal(350, 25, np.count_nonzero(spine_m))
             tumor_m = mask_data > 0
-            body_ct[tumor_m] = np.random.normal(90, 8, sh)[tumor_m]
+            body_ct[tumor_m] = np.random.normal(90, 8, np.count_nonzero(tumor_m))
             ct_data = body_ct
         else:
             mask_data = syn_mask
